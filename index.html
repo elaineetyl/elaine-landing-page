@@ -258,6 +258,25 @@
   .mobile-panel a{color:var(--cream); padding:16px 28px; font-size:15px; border-bottom:1px solid rgba(255,255,255,.06);}
   .mobile-panel.open{display:flex;}
 
+  /* ---------- Section-entrance animation ----------
+     Each section (below the hero) fades + slides up into view as the visitor
+     scrolls to it, on both mobile and desktop — a JS IntersectionObserver
+     adds .in-view the first time a .reveal-section enters the viewport (see
+     the script near the end of the file). The hero itself plays a plain CSS
+     entrance animation on load, since it's visible immediately and doesn't
+     need scroll-triggering. */
+  .reveal-section{opacity:0; transform:translateY(36px); transition:opacity .7s cubic-bezier(.22,.61,.36,1), transform .7s cubic-bezier(.22,.61,.36,1);}
+  .reveal-section.in-view{opacity:1; transform:none;}
+  @keyframes heroEnter{
+    from{opacity:0; transform:translateY(22px);}
+    to{opacity:1; transform:none;}
+  }
+  .hero-inner{animation:heroEnter .8s cubic-bezier(.22,.61,.36,1) both;}
+  @media (prefers-reduced-motion:reduce){
+    .reveal-section{opacity:1; transform:none; transition:none;}
+    .hero-inner{animation:none;}
+  }
+
   /* ---------- Hero ---------- */
   .hero{
     background:
@@ -3820,6 +3839,35 @@ const MARKET_PROJECTS = [{"name":"Kensho Residence","location":"Taman Desa","dev
       return lines.join('\n');
     }
 
+    // Turns the requirement form into readable lines (only the fields the
+    // visitor actually filled in), reused below for the WhatsApp enquiry.
+    function reqSummaryLines(req){
+      const lines = [];
+      if(req.purpose) lines.push(`Purpose: ${req.purpose === 'ownstay' ? 'Own Stay' : 'Investment'}`);
+      if(req.budget) lines.push(`Max budget: ${formatRM(req.budget)}`);
+      if(req.bedrooms) lines.push(`Min bedrooms: ${req.bedrooms}`);
+      if(req.sqft) lines.push(`Min built-up: ${req.sqft.toLocaleString()} sqft`);
+      if(req.titleType) lines.push(`Title type: ${req.titleType}`);
+      if(req.completionYear) lines.push(`Completion: ${req.completionYear === 'Completed' ? 'Already completed' : req.completionYear}`);
+      if(req.priorities.length) lines.push(`Priorities: ${req.priorities.map(k=> PRIORITY_LABELS[k] || k).join(', ')}`);
+      return lines;
+    }
+
+    // Builds the WhatsApp enquiry text for a matcher result card. When the
+    // visitor has entered real requirements (not just browsing the default
+    // list), the message carries those requirements plus the match score
+    // along with the project name, so Elaine gets full context on why this
+    // particular project was sent to her without the visitor typing anything.
+    function buildEnquiryMessage(p, result, req, isDefault){
+      const base = `Hi, I am interested in ${p.name} project! 😊`;
+      if(isDefault || isEmptyReq(req)) return base;
+      const reqLines = reqSummaryLines(req);
+      let msg = base;
+      if(reqLines.length) msg += `\n\nThis was suggested based on my requirements:\n${reqLines.map(l=> '- ' + l).join('\n')}`;
+      if(result && typeof result.score === 'number') msg += `\n\nMatch score: ${result.score}%`;
+      return msg;
+    }
+
     // isDefault = true when no requirements have been entered — the browse
     // listing (DEFAULT_LISTING_COUNT projects, no score badge, since every
     // project trivially scores 100% with nothing to compare against).
@@ -3828,7 +3876,7 @@ const MARKET_PROJECTS = [{"name":"Kensho Residence","location":"Taman Desa","dev
     const DEFAULT_LISTING_COUNT = 9;
     const resultsHeading = document.getElementById('matcherResultsHeading');
 
-    function renderResults(scored, isDefault){
+    function renderResults(scored, isDefault, req){
       resultsWrap.classList.add('show');
       resultsHeading.textContent = isDefault ? 'All Projects' : 'Recommended Projects';
       resultsMeta.textContent = isDefault
@@ -3875,7 +3923,7 @@ const MARKET_PROJECTS = [{"name":"Kensho Residence","location":"Taman Desa","dev
             ${reasonsHTML}
             ${drawbacksHTML}
             <div class="match-card-actions">
-              <a class="btn-copy" href="${waLink(`Hi, I am interested in ${p.name} project! 😊`)}" target="_blank" style="text-decoration:none;">Enquire on WhatsApp</a>
+              <a class="btn-copy" href="${waLink(buildEnquiryMessage(p, result, req, isDefault))}" target="_blank" style="text-decoration:none;">Enquire on WhatsApp</a>
             </div>
           </div>
         </div>`;
@@ -3912,7 +3960,7 @@ const MARKET_PROJECTS = [{"name":"Kensho Residence","location":"Taman Desa","dev
       }).sort((a,b)=> b.result.score - a.result.score);
 
       const shown = isDefault ? scored.slice(0, DEFAULT_LISTING_COUNT) : scored;
-      renderResults(shown, isDefault);
+      renderResults(shown, isDefault, req);
       if(scroll) resultsWrap.scrollIntoView({behavior:'smooth', block:'nearest'});
     }
 
@@ -3977,6 +4025,30 @@ const MARKET_PROJECTS = [{"name":"Kensho Residence","location":"Taman Desa","dev
   const mobilePanel = document.getElementById('mobilePanel');
   navToggle.addEventListener('click', ()=> mobilePanel.classList.toggle('open'));
   mobilePanel.querySelectorAll('a').forEach(a=> a.addEventListener('click', ()=> mobilePanel.classList.remove('open')));
+
+  // ---- Section-entrance animation (scroll reveal) ----
+  // Every section below the hero fades + slides up into view the first time
+  // it's scrolled to, on both mobile and desktop. The hero plays its own
+  // plain CSS load animation (see .hero-inner / @keyframes heroEnter) since
+  // it's visible immediately and doesn't need scroll-triggering.
+  (function(){
+    const sections = Array.from(document.querySelectorAll('section')).filter(s => !s.classList.contains('hero'));
+    sections.forEach(s => s.classList.add('reveal-section'));
+    if(!('IntersectionObserver' in window)){
+      // No IntersectionObserver support — just show everything, no animation.
+      sections.forEach(s => s.classList.add('in-view'));
+      return;
+    }
+    const observer = new IntersectionObserver((entries)=>{
+      entries.forEach(entry=>{
+        if(entry.isIntersecting){
+          entry.target.classList.add('in-view');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -60px 0px' });
+    sections.forEach(s => observer.observe(s));
+  })();
 })();
 </script>
 
