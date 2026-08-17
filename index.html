@@ -739,6 +739,10 @@
     .calculator-table{grid-template-columns:repeat(2,1fr);}
     .matcher-card{padding:26px 20px;}
     .mode-tab{min-width:100%;}
+    .contact-methods{
+      flex-direction:column; align-items:flex-start; justify-content:flex-start;
+      width:fit-content; margin:34px auto 0; gap:14px;
+    }
   }
 </style>
 </head>
@@ -3871,30 +3875,11 @@ const MARKET_PROJECTS = [{"name":"Kensho Residence","location":"Taman Desa","dev
             ${reasonsHTML}
             ${drawbacksHTML}
             <div class="match-card-actions">
-              <button type="button" class="btn-copy" data-summary-idx="${idx}">Copy Summary for Client</button>
               <a class="btn-copy" href="${waLink(`Hi, I am interested in ${p.name} project! 😊`)}" target="_blank" style="text-decoration:none;">Enquire on WhatsApp</a>
             </div>
           </div>
         </div>`;
       }).join('');
-
-      resultsList.querySelectorAll('[data-summary-idx]').forEach(btn=>{
-        btn.addEventListener('click', ()=>{
-          const idx = Number(btn.dataset.summaryIdx);
-          const text = scored[idx].summaryText;
-          const done = ()=>{
-            const original = 'Copy Summary for Client';
-            btn.textContent = 'Copied!';
-            btn.classList.add('copied');
-            setTimeout(()=>{ btn.textContent = original; btn.classList.remove('copied'); }, 1800);
-          };
-          if(navigator.clipboard && navigator.clipboard.writeText){
-            navigator.clipboard.writeText(text).then(done).catch(()=>{ btn.textContent = 'Copy failed — select manually'; });
-          } else {
-            done();
-          }
-        });
-      });
     }
 
     function isEmptyReq(req){
