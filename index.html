@@ -3420,6 +3420,13 @@ const MARKET_PROJECTS = [{"name":"Kensho Residence","location":"Taman Desa","dev
       <div>${areaIcon}<span>${p.sqftText || 'Size on request'}</span></div>`;
   }
 
+  // Matches the slug scheme used by the individually generated SEO pages
+  // under /projects/<slug>.html (see generate_project_pages.py) — keep
+  // these two in sync if that script's slugify() ever changes.
+  function slugify(name){
+    return (name || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+  }
+
   function renderProjects(list){
     currentList = list;
     if(list.length === 0){
@@ -3447,6 +3454,7 @@ const MARKET_PROJECTS = [{"name":"Kensho Residence","location":"Taman Desa","dev
             <div class="project-specs">${specsHTML(p)}</div>
             <p class="project-desc">${p.description || ''}</p>
             <div class="view-hint">Click to view layout &amp; details →</div>
+            <a class="view-page-link" href="/projects/${slugify(p.name)}.html" style="display:inline-block; margin-top:8px; color:var(--champagne-light); font-size:13px; text-decoration:underline;">View full listing page →</a>
           </div>
         </div>
       </div>`;
@@ -3570,6 +3578,7 @@ const MARKET_PROJECTS = [{"name":"Kensho Residence","location":"Taman Desa","dev
   }
 
   grid.addEventListener('click', (e)=>{
+    if(e.target.closest('a')) return; // let the "View full listing page" link navigate normally
     const card = e.target.closest('.project-card');
     if(card) openProjectModal(Number(card.dataset.index));
   });
