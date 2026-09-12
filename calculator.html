@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mortgage &amp; Stamp Duty Calculator - Elaine with Keys</title>
+<meta name="description" content="Estimate your monthly mortgage repayment, stamp duty (MOT), legal fees and total upfront cash needed to buy property in Malaysia.">
+<link rel="canonical" href="https://elainewithkeys.com/calculator.html">
+<meta name="robots" content="index, follow">
+
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="icon" type="image/png" sizes="512x512" href="/favicon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --charcoal:#161514; --charcoal-2:#1f1e1c; --charcoal-3:#2a2825;
+    --champagne:#c9a66b; --champagne-light:#e6d3ab;
+    --cream:#faf7f1; --cream-2:#f1ebe0;
+    --ink:#211f1c; --ink-soft:#6b6459; --line:#e7ded0; --white:#ffffff;
+    --shadow:0 20px 50px -20px rgba(22,21,20,0.35); --radius:14px;
+    --serif:'Playfair Display', Georgia, 'Times New Roman', serif;
+    --sans:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0; font-family:var(--sans); background:var(--cream); color:var(--ink); line-height:1.6;}
+  a{color:inherit;}
+  .container{max-width:1080px; margin:0 auto; padding:0 24px;}
+  header.site-header{background:var(--charcoal); padding:18px 0;}
+  .header-inner{display:flex; align-items:center; justify-content:space-between; gap:16px;}
+  .brand{display:flex; align-items:center; gap:12px; text-decoration:none;}
+  .brand-mark{width:40px; height:40px; border-radius:50%; background:linear-gradient(135deg,var(--champagne),var(--champagne-light)); display:flex; align-items:center; justify-content:center; font-family:var(--serif); font-weight:700; color:var(--charcoal); flex-shrink:0;}
+  .brand-name{font-family:var(--serif); color:var(--cream); font-size:18px; font-weight:600;}
+  .brand-name span{display:block; font-family:var(--sans); font-size:12px; color:var(--champagne-light); font-weight:400;}
+  .back-link{color:var(--champagne-light); text-decoration:none; font-size:14px;}
+  main{padding:50px 0 70px;}
+  .section-head{text-align:center; max-width:640px; margin:0 auto 34px;}
+  .eyebrow{display:inline-block; font-size:12.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--champagne); font-weight:600; margin-bottom:10px;}
+  h1{font-family:var(--serif); font-size:clamp(28px,4vw,38px); margin:0 0 12px;}
+  .section-head p{color:var(--ink-soft); font-size:15.5px;}
+  .calculator-card{max-width:1080px; margin:0 auto; background:var(--white); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); padding:40px 44px;}
+  .calculator-table{display:grid; grid-template-columns:repeat(8,1fr); border-top:1px solid var(--line); border-left:1px solid var(--line); border-radius:10px; overflow:hidden;}
+  .calc-col{padding:18px 8px; border-right:1px solid var(--line); border-bottom:1px solid var(--line); background:var(--cream); display:flex; flex-direction:column; gap:8px; align-items:center; text-align:center;}
+  .calc-col label{font-size:10.5px; letter-spacing:.04em; text-transform:uppercase; color:var(--ink-soft); font-weight:600;}
+  .calc-col input{width:100%; text-align:center; padding:8px 4px; border-radius:8px; border:1px solid var(--line); font-family:var(--sans); font-size:14px; color:var(--ink); background:var(--white); -webkit-appearance:none;}
+  .calc-col input:focus{outline:none; border-color:var(--champagne); box-shadow:0 0 0 3px rgba(201,166,107,.18);}
+  .calc-value{font-family:var(--serif); font-size:15px; font-weight:700; color:var(--ink); word-break:break-word;}
+  .calc-col.highlight{background:var(--champagne-light);}
+  .calc-col.highlight .calc-value{color:var(--charcoal); font-size:17px;}
+  .calculator-note{margin-top:18px; font-size:12px; color:var(--ink-soft); line-height:1.6;}
+  .calculator-disclaimer{margin-top:14px; font-size:12.5px; color:var(--ink-soft); text-align:center; max-width:680px; margin-left:auto; margin-right:auto;}
+  .btn-champagne{display:block; text-align:center; text-decoration:none; background:var(--champagne); color:var(--charcoal); font-weight:700; padding:15px; border-radius:999px; font-size:15px;}
+  footer{background:var(--charcoal); color:var(--champagne-light); padding:30px 0; font-size:13px;}
+  .footer-inner{display:flex; flex-wrap:wrap; gap:16px; justify-content:space-between; align-items:center;}
+  .footer-links a{color:var(--champagne-light); text-decoration:none; margin-left:16px;}
+  @media (max-width:980px){ .calculator-table{grid-template-columns:repeat(4,1fr);} }
+  @media (max-width:640px){
+    .header-inner{flex-direction:column; align-items:flex-start; gap:10px;}
+    .calculator-card{padding:26px 18px;}
+    .calculator-table{grid-template-columns:repeat(2,1fr);}
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="brand" href="/">
+      <span class="brand-mark">EK</span>
+      <span class="brand-name">Elaine with Keys<span>Real Estate Negotiator</span></span>
+    </a>
+    <a class="back-link" href="/#projects">&larr; All Listings</a>
+  </div>
+</header>
+
+<main>
+  <div class="container">
+    <div class="section-head">
+      <span class="eyebrow">Plan Ahead</span>
+      <h1>Mortgage &amp; Stamp Duty Calculator</h1>
+      <p>Estimate your monthly repayment and total upfront cash needed before you commit — adjust the numbers below, then message me for an accurate quote based on your bank and profile.</p>
+    </div>
+    <div class="calculator-card">
+      <div class="calculator-table" id="calculatorTable">
+        <div class="calc-col">
+          <label for="mcPrice">Property</label>
+          <input type="number" id="mcPrice" min="0" step="10000" value="650000">
+        </div>
+        <div class="calc-col">
+          <label for="mcDownPayment">Downpay %</label>
+          <input type="number" id="mcDownPayment" min="0" max="100" step="1" value="10">
+        </div>
+        <div class="calc-col">
+          <label>Principal</label>
+          <div class="calc-value" id="mcPrincipal">RM 0</div>
+        </div>
+        <div class="calc-col">
+          <label for="mcRate">Interest %</label>
+          <input type="number" id="mcRate" min="0" max="20" step="0.1" value="4.0">
+        </div>
+        <div class="calc-col">
+          <label for="mcTenure">Term (yrs)</label>
+          <input type="number" id="mcTenure" min="1" max="40" step="1" value="30">
+        </div>
+        <div class="calc-col highlight">
+          <label>Payment /mo</label>
+          <div class="calc-value" id="mcMonthly">RM 0</div>
+        </div>
+        <div class="calc-col">
+          <label>Expenses</label>
+          <div class="calc-value" id="mcExpenses">RM 0</div>
+        </div>
+        <div class="calc-col highlight">
+          <label>Total Upfront</label>
+          <div class="calc-value" id="mcTotal">RM 0</div>
+        </div>
+      </div>
+      <p class="calculator-note">Principal = Property &minus; Downpay. Expenses = estimated stamp duty (MOT + loan agreement) + legal fees (SPA + loan agreement) + valuation/insurance/admin. Total Upfront = Downpay + Expenses — the real cash you need on hand, not just the down payment.</p>
+      <a class="btn-champagne" style="margin-top:18px;" href="#" id="mcWhatsappBtn" target="_blank">Get a Personalised Quote</a>
+      <p class="calculator-disclaimer">Estimates only, for illustration purposes — actual bank rates, margin of finance, legal fees and stamp duty vary by bank and buyer profile. Message me directly for a quote based on your situation.</p>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="container footer-inner">
+    <div>&copy; <span id="footerYear"></span> Elaine with Keys. All rights reserved.</div>
+    <div class="footer-links">
+      <a href="tel:+60182176338">+60 18-217 6338</a>
+      <a href="mailto:elainetan.iqi.realty@gmail.com">elainetan.iqi.realty@gmail.com</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  document.getElementById('footerYear').textContent = new Date().getFullYear();
+
+  const WHATSAPP = '60182176338';
+  function waLink(msg){ return 'https://wa.me/' + WHATSAPP + '?text=' + encodeURIComponent(msg); }
+
+  const mcPrice = document.getElementById('mcPrice');
+  const mcDownPayment = document.getElementById('mcDownPayment');
+  const mcRate = document.getElementById('mcRate');
+  const mcTenure = document.getElementById('mcTenure');
+  const mcPrincipalEl = document.getElementById('mcPrincipal');
+  const mcMonthlyEl = document.getElementById('mcMonthly');
+  const mcExpensesEl = document.getElementById('mcExpenses');
+  const mcTotalEl = document.getElementById('mcTotal');
+  const mcWhatsappBtn = document.getElementById('mcWhatsappBtn');
+
+  // Pre-fill from ?price=XXXXXX when arriving from a project page's
+  // "Open the full calculator" link.
+  const params = new URLSearchParams(location.search);
+  const priceParam = parseFloat(params.get('price'));
+  if(priceParam > 0) mcPrice.value = priceParam;
+
+  const formatRM = n => 'RM ' + Math.max(0, Math.round(n || 0)).toLocaleString('en-MY');
+
+  // Same formulas as the homepage calculator — see its code comments there
+  // for sourcing (Malaysian stamp duty MOT tiers, Solicitors' Remuneration
+  // Order legal fee scale). Keep both in sync if rates ever change.
+  function stampDutyMOT(amount){
+    const tiers = [[100000, 0.01], [400000, 0.02], [500000, 0.03], [Infinity, 0.04]];
+    let duty = 0, remaining = amount;
+    for(const [band, rate] of tiers){
+      if(remaining <= 0) break;
+      const portion = Math.min(remaining, band);
+      duty += portion * rate;
+      remaining -= portion;
+    }
+    return duty;
+  }
+  function legalFeeScale(amount){
+    if(amount <= 0) return 0;
+    const tiers = [[500000, 0.0125], [Infinity, 0.01]];
+    let fee = 0, remaining = amount;
+    for(const [band, rate] of tiers){
+      if(remaining <= 0) break;
+      const portion = Math.min(remaining, band);
+      fee += portion * rate;
+      remaining -= portion;
+    }
+    return Math.max(fee, 500);
+  }
+
+  function calcMortgage(){
+    const price = parseFloat(mcPrice.value) || 0;
+    const downPct = Math.min(Math.max(parseFloat(mcDownPayment.value) || 0, 0), 100);
+    const years = Math.max(parseFloat(mcTenure.value) || 0, 0);
+    const ratePct = Math.max(parseFloat(mcRate.value) || 0, 0);
+
+    const downAmount = price * downPct / 100;
+    const principal = Math.max(price - downAmount, 0);
+    const monthlyRate = (ratePct / 100) / 12;
+    const n = years * 12;
+
+    let monthly = 0;
+    if(principal > 0 && n > 0){
+      monthly = monthlyRate === 0
+        ? principal / n
+        : principal * monthlyRate * Math.pow(1 + monthlyRate, n) / (Math.pow(1 + monthlyRate, n) - 1);
+    }
+
+    const motDuty = stampDutyMOT(price);
+    const loanDuty = principal * 0.005;
+    const spaLegalFee = legalFeeScale(price);
+    const loanLegalFee = legalFeeScale(principal) * 0.6;
+    const miscCosts = 1000;
+    const expenses = motDuty + loanDuty + spaLegalFee + loanLegalFee + miscCosts;
+    const totalUpfront = downAmount + expenses;
+
+    mcPrincipalEl.textContent = formatRM(principal);
+    mcMonthlyEl.textContent = formatRM(monthly);
+    mcExpensesEl.textContent = formatRM(expenses);
+    mcTotalEl.textContent = formatRM(totalUpfront);
+
+    mcWhatsappBtn.href = waLink(
+      `Hi Elaine, I used the mortgage calculator on your site.\n\n`
+      + `Property: ${formatRM(price)}\n`
+      + `Downpay: ${formatRM(downAmount)} (${downPct}%)\n`
+      + `Principal: ${formatRM(principal)}\n`
+      + `Interest: ${ratePct}% p.a. over ${years} years\n`
+      + `Payment: ${formatRM(monthly)}/mo\n`
+      + `Expenses (est.): ${formatRM(expenses)}\n`
+      + `Total Upfront (est.): ${formatRM(totalUpfront)}\n\n`
+      + `Could you help me get an accurate quote?`
+    );
+  }
+
+  [mcPrice, mcDownPayment, mcRate, mcTenure].forEach(el => el.addEventListener('input', calcMortgage));
+  calcMortgage();
+})();
+</script>
+
+</body>
+</html>
